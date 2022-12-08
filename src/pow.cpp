@@ -92,7 +92,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
         // Limit adjustment step
         int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
-        LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
+//      LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
         int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespan2Current * 99) / 70) : (nTargetTimespan2Current * 4);
         int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespan2Current * 70) / 99) : (nTargetTimespan2Current / 4);
 
@@ -114,10 +114,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         }
 
         /// debug print
-        LogPrintf("GetNextWorkRequired RETARGET\n");
-        LogPrintf("nTargetTimespan2 = %d    nActualTimespan = %d\n", nTargetTimespan2Current, nActualTimespan);
-        LogPrintf("Before: %08x\n", pindexLast->nBits);
-        LogPrintf("After:  %08x\n", bnNew.GetCompact());
+//      LogPrintf("GetNextWorkRequired RETARGET\n");
+//      LogPrintf("nTargetTimespan2 = %d    nActualTimespan = %d\n", nTargetTimespan2Current, nActualTimespan);
+//      LogPrintf("Before: %08x\n", pindexLast->nBits);
+//      LogPrintf("After:  %08x\n", bnNew.GetCompact());
 
     } else if (nHeight > params.novemberFork) {
         const_cast<Consensus::Params&>(params).hardForkedNovember = true;
@@ -191,7 +191,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
         while (last59TimeDifferences.size() != 59) {
             if (xy == 59) {
-                LogPrintf(" GetNextWorkRequired(): This shouldn't have happened \n");
+//              LogPrintf(" GetNextWorkRequired(): This shouldn't have happened \n");
                 break;
             }
 
@@ -201,7 +201,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
         sort(last59TimeDifferences.begin(), last59TimeDifferences.end(), comp64);
 
-        LogPrintf("  Median Time between blocks is: %d \n", last59TimeDifferences[29]);
+//      LogPrintf("  Median Time between blocks is: %d \n", last59TimeDifferences[29]);
         int64_t nActualTimespan = llabs((last59TimeDifferences[29]));
         int64_t medTime = nActualTimespan;
 
@@ -210,7 +210,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
             // Difficulty Fix here for case where average time between blocks becomes far longer than 2 minutes, even though median time is close to 2 minutes.
             // Uses the last 120 blocks(Should be 4 hours) for calculating
 
-            LogPrintf(" GetNextWorkRequired(): May Fork mode \n");
+//          LogPrintf(" GetNextWorkRequired(): May Fork mode \n");
 
             CBlockIndex tblock1 = *pindexLast; // We want to copy pindexLast to avoid changing it accidentally
             CBlockIndex* tblock2 = &tblock1;
@@ -236,7 +236,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
             while (last119TimeDifferences.size() != 119) {
                 if (xy == 119) {
-                    LogPrintf(" GetNextWorkRequired(): This shouldn't have happened 2 \n");
+//                  LogPrintf(" GetNextWorkRequired(): This shouldn't have happened 2 \n");
                     break;
                 }
 
@@ -254,7 +254,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
             averageTime = total / 119;
 
-            LogPrintf(" GetNextWorkRequired(): Average time between blocks: %d\n", averageTime);
+//          LogPrintf(" GetNextWorkRequired(): Average time between blocks: %d\n", averageTime);
             /*  LogPrintf(" GetNextWorkRequired(): Total Time (over 119 time differences) is: %"PRI64d" \n",total);
                 LogPrintf(" GetNextWorkRequired(): First Time (over 119 time differences) is: %"PRI64d" \n",last119TimeDifferences[0]);
                 LogPrintf(" GetNextWorkRequired(): Last Time (over 119 time differences) is: %"PRI64d" \n",last119TimeDifferences[118]);
@@ -266,14 +266,14 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
             if (nHeight <= params.julyFork2) {
                 // If the average time between blocks exceeds or is equal to 3 minutes then increase the med time accordingly
                 if (averageTime >= 180) {
-                    LogPrintf(" \n Average Time between blocks is too high.. Attempting to Adjust.. \n ");
+//                  LogPrintf(" \n Average Time between blocks is too high.. Attempting to Adjust.. \n ");
                     medTime = 130;
 
                 } else if (averageTime >= 108 && medTime < 120) {
                     // If the average time between blocks is more than 1.8 minutes and medTime is less than 120 seconds (which would ordinarily prompt an increase in difficulty)
                     // limit the stepping to something reasonable(so we don't see massive difficulty spike followed by miners leaving in these situations).
                     medTime = 110;
-                    LogPrintf("\n Medium Time between blocks is too low compared to average time.. Attempting to Adjust.. \n ");
+//                  LogPrintf("\n Medium Time between blocks is too low compared to average time.. Attempting to Adjust.. \n ");
                 }
 
             } else { // julyFork2 changes here
@@ -325,7 +325,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                 if (numTooClose > 0) {
                     // We found 6 blocks that were solved in exactly 10 minutes
                     // Averaging 1.66 minutes per block
-                    LogPrintf("DeadLock detected and fixed - Difficulty Increased\n");
+//                  LogPrintf("DeadLock detected and fixed - Difficulty Increased\n");
 
                     if (nHeight > params.julyFork2) {
                         medTime = 119;
@@ -335,7 +335,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
                     }
 
                 } else {
-                    LogPrintf(" \n DeadLock not detected. \n");
+//                  LogPrintf(" \n DeadLock not detected. \n");
                 }
             }
         }
@@ -373,7 +373,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         } else {
             nActualTimespan = medTime * 60;
 
-            LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
+//          LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
             int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 99) / 70) : (nTargetTimespanCurrent * 4);
             int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 70) / 99) : (nTargetTimespanCurrent / 4);
 
@@ -477,10 +477,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         }
 
         /// debug print
-        LogPrintf("GetNextWorkRequired RETARGET\n");
-        LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", nTargetTimespanCurrent, nActualTimespan);
-        LogPrintf("Before: %08x\n", pindexLast->nBits);
-        LogPrintf("After:  %08x\n", bnNew.GetCompact());
+//      LogPrintf("GetNextWorkRequired RETARGET\n");
+//      LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", nTargetTimespanCurrent, nActualTimespan);
+//      LogPrintf("Before: %08x\n", pindexLast->nBits);
+//      LogPrintf("After:  %08x\n", bnNew.GetCompact());
 
     } else {
         const_cast<Consensus::Params&>(params).hardForkedJuly = true;
@@ -530,7 +530,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
         // Limit adjustment step
         int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
-        LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
+//      LogPrintf("  nActualTimespan = %d  before bounds\n", nActualTimespan);
         int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 99) / 70) : (nTargetTimespanCurrent * 4);
         int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 70) / 99) : (nTargetTimespanCurrent / 4);
 
@@ -552,10 +552,10 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         }
 
         /// debug print
-        LogPrintf("GetNextWorkRequired RETARGET\n");
-        LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", nTargetTimespanCurrent, nActualTimespan);
-        LogPrintf("Before: %08x\n", pindexLast->nBits);
-        LogPrintf("After:  %08x\n", bnNew.GetCompact());
+//      LogPrintf("GetNextWorkRequired RETARGET\n");
+//      LogPrintf("nTargetTimespan = %d    nActualTimespan = %d\n", nTargetTimespanCurrent, nActualTimespan);
+//      LogPrintf("Before: %08x\n", pindexLast->nBits);
+//      LogPrintf("After:  %08x\n", bnNew.GetCompact());
     }
 
     return bnNew.GetCompact();
