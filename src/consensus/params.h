@@ -75,6 +75,18 @@ struct Params {
     int64_t DifficultyAdjustmentInterval() const { return nPowTargetTimespan / nPowTargetSpacing; }
     uint256 nMinimumChainWork;
     uint256 defaultAssumeValid;
+
+    /** Legacy fork parameters */
+    bool useNewDifficultyProtocol;
+    int julyFork;
+    int octoberFork;
+    int novemberFork;
+    int novemberFork2;
+    int mayFork;
+    int julyFork2;
+    int febFork;
+    bool hardForkedJuly = false;
+    bool hardForkedNovember = false;
 };
 } // namespace Consensus
 
