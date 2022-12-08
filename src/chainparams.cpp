@@ -51,7 +51,7 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "NY Times 05/Oct/2011 Steve Jobs, Apple’s Visionary, Dies at 56";
+    const char* pszTimestamp = "The Times 14/May/2013 Justice Dept. Opens Criminal Inquiry Into I.R.S. Audits";
     const CScript genesisOutputScript = CScript() << ParseHex("040184710fa689ad5023690c80f3a49c8f13f8d45b8c857fbcbc8bc4a8e4d3eb4b10f4d4604fa08dce601aaf0f470216fe1b51850b4acf21b179c45070ac7b03a9") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
@@ -63,15 +63,15 @@ class CMainParams : public CChainParams {
 public:
     CMainParams() {
         strNetworkID = "main";
-        consensus.nSubsidyHalvingInterval = 840000;
-        consensus.BIP16Height = 218579; // 87afb798a3ad9378fcd56123c81fb31cfd9a8df4719b9774d71730c16315a092 - October 1, 2012
-        consensus.BIP34Height = 710000;
-        consensus.BIP34Hash = uint256S("fa09d204a83a768ed5a7c8d441fa62f2043abf420cff1226c7b4329aeb9d51cf");
-        consensus.BIP65Height = 918684; // bab3041e8977e0dc3eeff63fe707b92bde1dd449d8efafb248c27c8264cc311a
-        consensus.BIP66Height = 811879; // 7aceee012833fa8952f8835d8b1b3ae233cd6ab08fdb27a771d2bd7bdc491894
-        consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); 
-        consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // 3.5 days
-        consensus.nPowTargetSpacing = 2.5 * 60;
+
+        consensus.BIP16Height = 0;
+        consensus.BIP34Height = 815135;
+        consensus.BIP34Hash = uint256();
+        consensus.BIP65Height = 815135;
+        consensus.BIP66Height = 815135;
+        consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nPowTargetTimespan = 2.0 * 60 * 60; // Difficulty changes every 60 blocks
+        consensus.nPowTargetSpacing = 2.0 * 60;
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 6048; // 75% of 8064
@@ -82,57 +82,57 @@ public:
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1485561600; // January 28, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1517356801; // January 31st, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1525132800; // Tuesday, May 1, 2018 12:00:00 AM GMT
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1556668800; // Wednesday, May 1, 2019 12:00:00 AM GMT
 
         // Deployment of SegWit (BIP141, BIP143, and BIP147)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1485561600; // January 28, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1517356801; // January 31st, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = std::numeric_limits<uint64_t>::max();
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = std::numeric_limits<uint64_t>::max();
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000002ee655bf00bf13b4cca");
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0xb34a457c601ef8ce3294116e3296078797be7ded1b0d12515395db9ab5e93ab8"); //1683528
+        consensus.defaultAssumeValid = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xfb;
-        pchMessageStart[1] = 0xc0;
-        pchMessageStart[2] = 0xb6;
-        pchMessageStart[3] = 0xdb;
-        nDefaultPort = 9333;
+        pchMessageStart[0] = 0xfd;
+        pchMessageStart[1] = 0xc2;
+        pchMessageStart[2] = 0xb4;
+        pchMessageStart[3] = 0xdd;
+        nDefaultPort = 8121;
         nPruneAfterHeight = 100000;
         m_assumed_blockchain_size = 22;
         m_assumed_chain_state_size = 3;
 
-        genesis = CreateGenesisBlock(1317972665, 2084524493, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1368560876, 3591624, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2"));
-        assert(genesis.hashMerkleRoot == uint256S("0x97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"));
+        assert(consensus.hashGenesisBlock == uint256S("0xdced3542896ed537cb06f9cb064319adb0da615f64dd8c5e5bad974398f44b24"));
+        assert(genesis.hashMerkleRoot == uint256S("0xa215e67ba165202f75b6458d22fedd1a3ec4f03449a4c6b2a4b8130bfebd3b15"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("seed-a.litecoin.loshan.co.uk");
-        vSeeds.emplace_back("dnsseed.thrasher.io");
-        vSeeds.emplace_back("dnsseed.litecointools.com");
-        vSeeds.emplace_back("dnsseed.litecoinpool.org");
+        vSeeds.emplace_back("dnsseed.netseed.net");
+        vSeeds.emplace_back("cm.goldcoinproject.org");
+        vSeeds.emplace_back("seed.glcseed.net");
+        vSeeds.emplace_back("vps.netseed.net");
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,32);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5);
         base58Prefixes[SCRIPT_ADDRESS2] = std::vector<unsigned char>(1,50);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,176);
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,160);
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
-        bech32_hrp = "ltc";
+        bech32_hrp = "gld";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
@@ -142,30 +142,54 @@ public:
 
         checkpointData = {
             {
-                {  1500, uint256S("0x841a2965955dd288cfa707a755d05a54e45f8bd476835ec9af4402a2b59a2967")},
-                {  4032, uint256S("0x9ce90e427198fc0ef05e5905ce3503725b80e26afd35a987965fd7e3d9cf0846")},
-                {  8064, uint256S("0xeb984353fc5190f210651f150c40b8a4bab9eeeff0b729fcb3987da694430d70")},
-                { 16128, uint256S("0x602edf1859b7f9a6af809f1d9b0e6cb66fdc1d4d9dcd7a4bec03e12a1ccd153d")},
-                { 23420, uint256S("0xd80fdf9ca81afd0bd2b2a90ac3a9fe547da58f2530ec874e978fce0b5101b507")},
-                { 50000, uint256S("0x69dc37eb029b68f075a5012dcc0419c127672adb4f3a32882b2b3e71d07a20a6")},
-                { 80000, uint256S("0x4fcb7c02f676a300503f49c764a89955a8f920b46a8cbecb4867182ecdb2e90a")},
-                {120000, uint256S("0xbd9d26924f05f6daa7f0155f32828ec89e8e29cee9e7121b026a7a3552ac6131")},
-                {161500, uint256S("0xdbe89880474f4bb4f75c227c77ba1cdc024991123b28b8418dbbf7798471ff43")},
-                {179620, uint256S("0x2ad9c65c990ac00426d18e446e0fd7be2ffa69e9a7dcb28358a50b2b78b9f709")},
-                {240000, uint256S("0x7140d1c4b4c2157ca217ee7636f24c9c73db39c4590c4e6eab2e3ea1555088aa")},
-                {383640, uint256S("0x2b6809f094a9215bafc65eb3f110a35127a34be94b7d0590a096c3f126c6f364")},
-                {409004, uint256S("0x487518d663d9f1fa08611d9395ad74d982b667fbdc0e77e9cf39b4f1355908a3")},
-                {456000, uint256S("0xbf34f71cc6366cd487930d06be22f897e34ca6a40501ac7d401be32456372004")},
-                {638902, uint256S("0x15238656e8ec63d28de29a8c75fcf3a5819afc953dcd9cc45cecc53baec74f38")},
-                {721000, uint256S("0x198a7b4de1df9478e2463bd99d75b714eab235a2e63e741641dc8a759a9840e5")},
+		    {          0, uint256S("0xdced3542896ed537cb06f9cb064319adb0da615f64dd8c5e5bad974398f44b24")},
+		    {          1, uint256S("0xe39be079a4e57af79f63edb2726bdcb401ae520fa5b5328bbeab185b5b3d636e")},
+		    {         50, uint256S("0x34b021706ae2b72e41d411a31ead78219087213a29fe338515926f055a4c5655")},
+		    {        150, uint256S("0xc3565831a172cf737b0dd8bd47a81f2dfe99012c97362f397838e617d26ba99b")},
+		    {        300, uint256S("0x52d9e6919828769b358db66f8793a06e5915948d0a0ee36f59465e91dabb97a6")},
+		    {        500, uint256S("0x6ba9043e14339790c56181da3ef4d87ff58b8cd3c07b2d33e7d808e189136002")},
+		    {       1000, uint256S("0x29607502895cf180b7b556f0bc70b2001eacb819be6b4be1e5f0092622e03cb3")},
+		    {       6048, uint256S("0xe8eb14ac03f25fd52a46b51acba8af543f6b4baf1b85b62d6e6e09ba5f108ed7")},
+		    {      12096, uint256S("0xd2bd87d677cced55584634d6d03434e041d5dbbaf5639c873a5f6a654d788ad1")},
+		    {      16128, uint256S("0x290d05c1f5fb2cc75d5bc7657141e4e42d4ee7b4e78a73c96fac878a58d52057")},
+		    {      18143, uint256S("0x996caca04cce6ffc7f1053abcd350742e2ecc3220663cfd3e3585e3442d7cf74")},
+		    {      18144, uint256S("0xed5124e191b92d5405374dc4018203a7e03f4251293b6d5f57a83d1e1ff4df30")},
+		    {      20160, uint256S("0xe19b119f4a633d89320d502e7c05b88d083acdff3b4bd40efcdca54b25f6cb2c")},
+		    {      20500, uint256S("0x23ab64ad71d7191c28010c7c1b0b35d32ac97ace893dbb20068a6abb617f80a4")},
+		    {      24000, uint256S("0xc3cf2892cbaaf8b88565f027460bda831a428bf6ea76fafa870bf3586dd07c5f")},
+		    {      27000, uint256S("0xf7391f58e29d057f152b9c124af6153dadb62385d8728118e9cef728d9a4d16d")},
+		    {      28000, uint256S("0x28adf712f2a7d9d7ab3836249c9e2beff8d0deb362a1991c61cb61c0fe9af10b")},
+		    {      29000, uint256S("0x0aca7e1d7cebe224479db62d9887bba7e8dbf5cc295261b6b2e9b9bc76f58ab1")},
+		    {      30000, uint256S("0x1ff80eac17ba7efc350d65d842cbedd5822b4bef3eae7b1c24424c0d5cc2af51")},
+		    {      31000, uint256S("0xe9a24595526e9c67357e3a5962e8d489a867573eef1ea104de6be113d26512de")},
+		    {      35000, uint256S("0x0d8f14bc84ed93490b8c2070de4b744085a4d661f7ef96c856fd32572bbd87fc")},
+		    {      45000, uint256S("0x612461aaa0ca6a3bc07238ac86e67fa37ae1b8b083d0c1e23f396bbe5bd05896")},
+		    {      50000, uint256S("0xe251895683ec1363344504b91d9899c29064afc786905c9a052d61ee88a95206")},
+		    {      60000, uint256S("0xf03feaab75843a39be8cf0fbf8bdae3056aebd4817b89a99e4837db2bdd2659a")},
+		    {      65000, uint256S("0xb635ce68527e8b777f68a71fe441faab285fa7aafd78259ddc24843539bba369")},
+		    {      66000, uint256S("0xf619fc8b01c1aedcf4623cea7d85310db85174e27e1b3069dadf76e9bc2f6c99")},
+		    {      82900, uint256S("0xd411f2115353a132b425c498be3e521b6dbabc424259ce9cba822da46cc41ba4")},
+		    {      86000, uint256S("0x5a4fac33aa961451860b15dd8a8adfe5c6a0e0ce3fee503ff5b9e5162f2a7ccf")},
+		    {     100000, uint256S("0x292b50277877a5d7780614f460f669467d09f7d47a84765fb9633c9c78aa035a")},
+		    {     100989, uint256S("0xb0a9b5749a77c6b3f17935fe220c8a76d56003d2f9e2cbd281f5a7315eae5924")},
+		    {     115300, uint256S("0x77b3f1913755a4d381f36cd134f280a6519dd54d1c33c499eeded256f36bb394")},
+		    {     246100, uint256S("0xca7ed43264e0e8965d4115d2f8d3fabb63dcb430fe502d31796c63658ab8274d")},
+		    {     300000, uint256S("0xe81d2c84c9e7332b35788c1166a0b2c9a34be4d17f08f44a9ba2f5edd82dc300")},
+		    {     372000, uint256S("0xe3d2857896d0f52ac502eb056ac23f416cb7eddb0a6eba68785b940cca8257ee")},
+		    {     564000, uint256S("0x9d67ce445d6b513074ef061066bb331871901b953b3bdeaa4dc0a4043cf189f8")},
+		    {     815135, uint256S("0x7a577f2f264db62a7ce9a99b2c95cf9af44c4fb8067394f1ab4cd0b5da9b49f2")},
+		    {     889411, uint256S("0xc483518b3dbd585e3b04ad29070ee3d6fb90553995b0a5b36a5ca85d0e9c777d")},
+		    {    1430115, uint256S("0x78911d0d5eaf05a0d2feca3682f8d7c7a8b6fb3797d064cb14b213ff391e535e")},
+		    {    1733326, uint256S("0x31bbbb5b278732a2a180bb78a8c23e72569cd8ac760387437a8f8e6a37992ac8")},
             }
         };
 
         chainTxData = ChainTxData{
-            // Data from rpc: getchaintxstats 4096 2cdba8c47858d34cf0e02dfb8733263a3ed8705b1663ec7c158783d77b93e7ee
-            /* nTime    */ 1565379143,
-            /* nTxCount */ 36299075,
-            /* dTxRate  */ 0.388813310286546
+            // Data as of block 31bbbb5b278732a2a180bb78a8c23e72569cd8ac760387437a8f8e6a37992ac8 (height 1733326).
+            1669466255, // * UNIX timestamp of last known number of transactions
+            2480326,  // * total number of transactions between genesis and that timestamp
+                    //   (the tx=... number in the SetBestChain debug.log lines)
+            0.123098 // * estimated number of transactions per second after that timestamp
         };
 
         /* disable fallback fee on mainnet */
@@ -180,59 +204,59 @@ class CTestNetParams : public CChainParams {
 public:
     CTestNetParams() {
         strNetworkID = "test";
-        consensus.nSubsidyHalvingInterval = 840000;
-        consensus.BIP16Height = 0; // always enforce P2SH BIP16 on testnet
-        consensus.BIP34Height = 76;
-        consensus.BIP34Hash = uint256S("8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573");
-        consensus.BIP65Height = 76; // 8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573
-        consensus.BIP66Height = 76; // 8075c771ed8b495ffd943980a95f702ab34fce3c8c54e379548bda33cc8c0573
+
+        consensus.BIP16Height = 0;
+        consensus.BIP34Height = 1000000;
+        consensus.BIP34Hash = uint256();
+        consensus.BIP65Height = 1000000;
+        consensus.BIP66Height = 1000000;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // 3.5 days
-        consensus.nPowTargetSpacing = 2.5 * 60;
+        consensus.nPowTargetTimespan = 2.0 * 60 * 60; // Difficulty changes every 60 blocks
+        consensus.nPowTargetSpacing = 2.0 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
-        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
-        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.nRuleChangeActivationThreshold = 1512;
+        consensus.nMinerConfirmationWindow = 2016;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1483228800; // January 1, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1517356801; // January 31st, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1514772000; // January 1st, 2018 - 2AM GMT
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1546308000; // January 1st, 2019 - 2AM GMT
 
         // Deployment of SegWit (BIP141, BIP143, and BIP147)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1483228800; // January 1, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1517356801; // January 31st, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = std::numeric_limits<uint64_t>::max();
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = std::numeric_limits<uint64_t>::max();
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000035ed7ece35dc93");
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0xf19dfbdc0e6c399ef45d315d89fc3e972dd8da74503252bacaf664f64d86e6f6"); //1174621
+        consensus.defaultAssumeValid = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
 
-        pchMessageStart[0] = 0xfd;
-        pchMessageStart[1] = 0xd2;
-        pchMessageStart[2] = 0xc8;
-        pchMessageStart[3] = 0xf1;
-        nDefaultPort = 19335;
-        nPruneAfterHeight = 1000;
-        m_assumed_blockchain_size = 2;
-        m_assumed_chain_state_size = 1;
+        /**
+         * The message start string is designed to be unlikely to occur in normal data.
+         * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
+         * a large 32-bit integer with any alignment.
+         */
+        pchMessageStart[0] = 0xfc;
+        pchMessageStart[1] = 0xc5;
+        pchMessageStart[2] = 0xb4;
+        pchMessageStart[3] = 0xdd;
+        nDefaultPort = 18121;
+        m_assumed_blockchain_size = 22;
+        m_assumed_chain_state_size = 3;
 
-        genesis = CreateGenesisBlock(1486949366, 293345, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1513056232, 2702105, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"));
-        assert(genesis.hashMerkleRoot == uint256S("0x97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"));
+        assert(consensus.hashGenesisBlock == uint256S("0x63ee26429068a53a39ab251fb3d611bbac9539651f1bae5d7e73adac3767e513"));
+        assert(genesis.hashMerkleRoot == uint256S("0xa215e67ba165202f75b6458d22fedd1a3ec4f03449a4c6b2a4b8130bfebd3b15"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        // nodes with support for servicebits filtering should be at the top
-        vSeeds.emplace_back("testnet-seed.litecointools.com");
-        vSeeds.emplace_back("seed-b.litecoin.loshan.co.uk");
-        vSeeds.emplace_back("dnsseed-testnet.thrasher.io");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
@@ -241,7 +265,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
-        bech32_hrp = "tltc";
+        bech32_hrp = "tgld";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 
@@ -251,15 +275,14 @@ public:
 
         checkpointData = {
             {
-                {2056, uint256S("17748a31ba97afdc9a4f86837a39d287e3e7c7290a08a1d816c5969c78a83289")},
+		    {          0, uint256S("0x63ee26429068a53a39ab251fb3d611bbac9539651f1bae5d7e73adac3767e513")},
             }
         };
 
         chainTxData = ChainTxData{
-            // Data from rpc: getchaintxstats 4096 e79561972208ba3a02c308482176b33f3ec841d4213ea7bbaa3f22b7c8a16f32
-            /* nTime    */ 1565582448,
-            /* nTxCount */ 2848910,
-            /* dTxRate  */ 0.02265200874042768
+            0,
+            0,
+            0
         };
 
         /* enable fallback fee on testnet */
@@ -274,25 +297,25 @@ class CRegTestParams : public CChainParams {
 public:
     explicit CRegTestParams(const ArgsManager& args) {
         strNetworkID = "regtest";
-        consensus.nSubsidyHalvingInterval = 150;
+
         consensus.BIP16Height = 0;
-        consensus.BIP34Height = 500; // BIP34 activated on regtest (Used in functional tests)
+        consensus.BIP34Height = 100000000;
         consensus.BIP34Hash = uint256();
         consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in functional tests)
         consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in functional tests)
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 3.5 * 24 * 60 * 60; // two weeks
-        consensus.nPowTargetSpacing = 2.5 * 60;
+        consensus.nPowTargetTimespan = 2.0 * 60 * 60; // Difficulty changes every 60 blocks
+        consensus.nPowTargetSpacing = 2.0 * 60;
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
         consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 999999999999ULL;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
@@ -303,21 +326,19 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x00");
 
-        pchMessageStart[0] = 0xfa;
-        pchMessageStart[1] = 0xbf;
+        pchMessageStart[0] = 0xfe;
+        pchMessageStart[1] = 0xc3;
         pchMessageStart[2] = 0xb5;
-        pchMessageStart[3] = 0xda;
-        nDefaultPort = 19444;
+        pchMessageStart[3] = 0xde;
+        nDefaultPort = 18130;
         nPruneAfterHeight = 1000;
         m_assumed_blockchain_size = 0;
         m_assumed_chain_state_size = 0;
 
-        UpdateVersionBitsParametersFromArgs(args);
-
-        genesis = CreateGenesisBlock(1296688602, 0, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1296688602, 4, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9"));
-        assert(genesis.hashMerkleRoot == uint256S("0x97ddfbbae6be97fd6cdf3e7ca13232a3afff2353e29badfab7f73011edd4ced9"));
+        assert(consensus.hashGenesisBlock == uint256S("0x46ca35deafc8f494066bc82f05d7f850479f228ab9196cd659da5fad831122eb"));
+        assert(genesis.hashMerkleRoot == uint256S("0xa215e67ba165202f75b6458d22fedd1a3ec4f03449a4c6b2a4b8130bfebd3b15"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
@@ -328,7 +349,7 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("530827f38f93b43ed12af0b3ad25a288dc02ed74d6d7857862df51fc56c416f9")},
+                {0, uint256S("0x46ca35deafc8f494066bc82f05d7f850479f228ab9196cd659da5fad831122eb")},
             }
         };
 
