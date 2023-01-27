@@ -48,7 +48,7 @@
 #include <boost/thread.hpp>
 
 #if defined(NDEBUG)
-# error "Litecoin cannot be compiled without assertions."
+# error "Goldcoin cannot be compiled without assertions."
 #endif
 
 #define MICRO 0.000001
@@ -257,7 +257,7 @@ std::atomic_bool g_is_mempool_loaded{false};
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
 
-const std::string strMessageMagic = "Litecoin Signed Message:\n";
+const std::string strMessageMagic = "Goldcoin Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -1153,14 +1153,35 @@ bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
+    CAmount nSubsidy = 50 * COIN;//First block is worth a ceremonial 50 coins.
 
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
+    if (nHeight > 0 && nHeight <= 200)
+    {
+        nSubsidy = 10000 * COIN;//Super blocks most of which were given away as bounties
+    }
+    else if (nHeight > 200 && nHeight <= 2200)
+    {
+        nSubsidy = 1000 * COIN;//Most of these are what caused GLC to break all coin record LTC volume on Cryptsy
+    }
+    else if (nHeight > 2200 && nHeight < consensusParams.julyFork)
+    {
+        nSubsidy = 500 * COIN;//Was at this reward level for several months!
+    }
+    else if (nHeight >= consensusParams.julyFork && nHeight <= 26325000)
+    {
+        const_cast<Consensus::Params&>(consensusParams).hardForkedJuly = true;
+        if (nHeight >= consensusParams.febFork) {
+            nSubsidy = (int64_t)(50.0 / (1.1 + 0.49 * ((nHeight + 4884000 - consensusParams.julyFork) / 262800))) * COIN;
+        } else {
+            nSubsidy = (int64_t)(50.0 / (1.1 + 0.49 * ((nHeight - consensusParams.julyFork) / 262800))) * COIN;
+        }
+        if (nHeight >= consensusParams.novemberFork) {
+            const_cast<Consensus::Params&>(consensusParams).hardForkedNovember = true;
+        }
+    } else {
+        nSubsidy = 0;
+    }
+
     return nSubsidy;
 }
 
@@ -2601,7 +2622,7 @@ bool CChainState::ActivateBestChainStep(CValidationState& state, const CChainPar
     return true;
 }
 
-static void NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
+static bool NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
     bool fNotify = false;
     bool fInitialBlockDownload = false;
     static CBlockIndex* pindexHeaderOld = nullptr;
@@ -2620,6 +2641,7 @@ static void NotifyHeaderTip() LOCKS_EXCLUDED(cs_main) {
     if (fNotify) {
         uiInterface.NotifyHeaderTip(fInitialBlockDownload, pindexHeader);
     }
+    return fNotify;
 }
 
 static void LimitValidationInterfaceQueue() {
@@ -3113,7 +3135,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // checks that use witness data may be performed here.
 
     // Size limits
-    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
+    if (block.vtx.empty() || block.vtx.size() > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) > MAX_BLOCK_WEIGHT)
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-length", false, "size limits failed");
 
     // First transaction must be coinbase, the rest must not be
@@ -3145,8 +3167,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
 
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params)
 {
-    LOCK(cs_main);
-    return (VersionBitsState(pindexPrev, params, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == ThresholdState::ACTIVE);
+    return false;
 }
 
 bool IsNullDummyEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params)
@@ -3256,9 +3277,9 @@ static bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationSta
             return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
                                  strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
-    if (block.nVersion < VERSIONBITS_TOP_BITS && IsWitnessEnabled(pindexPrev, consensusParams))
-        return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
-                                 strprintf("rejected nVersion=0x%08x block", block.nVersion));
+//  if (block.nVersion < VERSIONBITS_TOP_BITS && IsWitnessEnabled(pindexPrev, consensusParams))
+//      return state.Invalid(false, REJECT_OBSOLETE, strprintf("bad-version(0x%08x)", block.nVersion),
+//                               strprintf("rejected nVersion=0x%08x block", block.nVersion));
 
     return true;
 }
@@ -3310,7 +3331,8 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
     //   {0xaa, 0x21, 0xa9, 0xed}, and the following 32 bytes are SHA256^2(witness root, witness reserved value). In case there are
     //   multiple, the last one is used.
     bool fHaveWitness = false;
-    if (VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == ThresholdState::ACTIVE) {
+    if (IsWitnessEnabled(pindexPrev, consensusParams) && \
+        VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == ThresholdState::ACTIVE) {
         int commitpos = GetWitnessCommitmentIndex(block);
         if (commitpos != -1) {
             bool malleated = false;
@@ -3344,7 +3366,7 @@ static bool ContextualCheckBlock(const CBlock& block, CValidationState& state, c
     // large by filling up the coinbase witness, which doesn't change
     // the block hash, so we couldn't mark the block as permanently
     // failed).
-    if (GetBlockWeight(block) > MAX_BLOCK_WEIGHT) {
+    if ((GetBlockWeight(block) / WITNESS_SCALE_FACTOR) > MAX_BLOCK_WEIGHT) {
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-weight", false, strprintf("%s : weight limit failed", __func__));
     }
 
@@ -3449,7 +3471,11 @@ bool ProcessNewBlockHeaders(const std::vector<CBlockHeader>& headers, CValidatio
             }
         }
     }
-    NotifyHeaderTip();
+    if (NotifyHeaderTip()) {
+        if (IsInitialBlockDownload() && ppindex && *ppindex) {
+            LogPrintf("Synchronizing blockheaders, height: %d (~%.2f%%)\n", (*ppindex)->nHeight, 100.0/((*ppindex)->nHeight+(GetAdjustedTime() - (*ppindex)->GetBlockTime()) / Params().GetConsensus().nPowTargetSpacing) * (*ppindex)->nHeight);
+        }
+    }
     return true;
 }
 
